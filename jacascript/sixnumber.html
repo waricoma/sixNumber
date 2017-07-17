@@ -1,0 +1,236 @@
+<script>
+let numberInput = [10,9,25,1,100,1];
+let numberInputLen = numberInput.length;
+let input = [];
+for(let i = 0; i < numberInputLen; i++)input[i] = numberInput[i] + "";
+
+let question = 271;
+
+let firstExecutionPermit = true;
+let duplicateTimesArray = [];
+for(let i = 0; i < 6; i++){
+    if(input[i] < 0){
+        firstExecutionPermit = false;
+        console.log("6つの数字はすべて正の整数でなくてはなりません。");
+        break;
+    }
+    if(duplicateTimesArray[ input[i] ] === undefined) duplicateTimesArray[ input[i] ] = 0;
+    duplicateTimesArray[ input[i] ]++;
+}
+
+let targetInput = 0;
+
+if(firstExecutionPermit){
+
+    let sixMap = {};
+
+    for(let a = 0; a < 6; a++){
+        if(input[a] in sixMap){
+            break;
+        }else{
+            sixMap[input[a]] = {};
+        }
+        for(let b = 0; b < 6; b++){
+            targetInput= input[b];
+            if(targetInput in sixMap[input[a]]){
+                break;
+            }else{
+                sixMap[input[a]][targetInput] = {};
+            }
+            for(let c = 0; c < 6; c++){
+                targetInput= input[c];
+                if(targetInput in sixMap[input[a]][input[b]]){
+                    break;
+                }else{
+                    sixMap[input[a]][input[b]][targetInput] = {};
+                }
+                for(let d = 0; d < 6; d++){
+                    targetInput= input[d];
+                    if(targetInput in sixMap[input[a]][input[b]][input[c]]){
+                        break;
+                    }else{
+                        sixMap[input[a]][input[b]][input[c]][targetInput] = {};
+                    }
+                    for(let e = 0; e < 6; e++){
+                        targetInput= input[e];
+                        if(targetInput in sixMap[input[a]][input[b]][input[c]][input[d]]){
+                            break;
+                        }else{
+                            sixMap[input[a]][input[b]][input[c]][input[d]][targetInput] = {};
+                        }
+                        for(let f = 0; f < 6; f++){
+                            targetInput= input[f];
+                            if(targetInput in sixMap[input[a]][input[b]][input[c]][input[d]][input[e]]){
+                                break;
+                            }else{
+                                sixMap[input[a]][input[b]][input[c]][input[d]][input[e]][targetInput] = {};
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    let signs = [];
+    let ssigns = [];
+    let calculations = [];
+    let calculationsLen = 0;
+    let calculationDesk = 0;
+    let excludingStamp = true;
+    let thatKeyCount = 0;
+    let calculatingSymbol = ["+" , "-" , "*" , "/"];
+    let execution = true;
+
+    function calculation(oneFloor ,sings ,calculations){
+        if(execution){
+            oneFloor = parseInt(oneFloor ,10);
+            calculationDesk = oneFloor;
+            calculationsLen = calculations.length;
+            for(let i = 0; i < calculationsLen; i++){
+                calculations[i] = parseInt(calculations[i] ,10);
+                if(sings[i] == 0){
+                    calculationDesk += calculations[i];
+                }else if(calculationDesk < calculations[i]){
+                    excludingStamp = false;
+                }else if(sings[i] == 1){
+                    calculationDesk -= calculations[i];
+                }else if(sings[i] == 2){
+                    calculationDesk *= calculations[i];
+                }else if(calculationDesk < calculations[i]||calculations[i] == 0||calculationDesk == 0){
+                    excludingStamp = false;
+                }else if(sings[i] == 3){
+                    calculationDesk /= calculations[i];
+                }
+            }
+            if(excludingStamp&&calculationDesk == question){
+                singss = sings;
+                calculations.unshift(oneFloor);
+                for(let i = 0; i <numberInputLen; i++){
+                    thatKeyCount = calculations.filter(function (search) { return search === numberInput[i]; }).length;
+                    if(duplicateTimesArray[numberInput[i]] < thatKeyCount){
+                        excludingStamp = false;
+                        break;
+                    }
+                }
+                if(excludingStamp){
+                    let resultReportCalculationDesk = calculations[0];
+                    let resultReportText = calculations[0] + "";
+                    let calculationsLen = calculations.length;
+                    for(let i = 1; i < calculationsLen; i++){
+                        j = i - 1;
+                        if(i != calculationsLen){
+                            resultReportText += " " + calculatingSymbol[ singss[j] ] + " ";
+                            if(sings[j] == 0){
+                                resultReportCalculationDesk += calculations[i];
+                            }else if(sings[j] == 1){
+                                resultReportCalculationDesk -= calculations[i];
+                            }else if(sings[j] == 2){
+                                resultReportCalculationDesk *= calculations[i];
+                            }else if(sings[j] == 3){
+                                resultReportCalculationDesk /= calculations[i];
+                            }
+                            resultReportText += calculations[i] + " = " + resultReportCalculationDesk + "\n";
+                            if(i != calculationsLen-1) resultReportText += resultReportCalculationDesk;
+                        }
+                    }
+                    console.log(resultReportText);
+                    execution = false;
+                }
+            }
+            excludingStamp = true;
+        }
+    }
+
+    for(oneFloor in sixMap){
+        for(let a = 0; a < 4; a++){
+            for(twoFloor in sixMap[oneFloor]){
+                sings = [a];
+                calculations = [twoFloor];
+                calculation(oneFloor ,sings ,calculations);
+            }
+        }
+    }
+
+    for(oneFloor in sixMap){
+        for(let a = 0; a < 4; a++){
+            for(twoFloor in sixMap[oneFloor]){
+                for(let b = 0; b < 4; b++){
+                    for(threeFloor in sixMap[oneFloor][twoFloor]){
+                        sings = [a ,b];
+                        calculations = [twoFloor ,threeFloor];
+                        calculation(oneFloor ,sings ,calculations);
+                    }
+                }
+            }
+        }
+    }
+
+    for(oneFloor in sixMap){
+        for(let a = 0; a < 4; a++){
+            for(twoFloor in sixMap[oneFloor]){
+                for(let b = 0; b < 4; b++){
+                    for(threeFloor in sixMap[oneFloor][twoFloor]){
+                        for(let c = 0; c < 4; c++){
+                            for(fourFloor in sixMap[oneFloor][twoFloor][threeFloor]){
+                                sings = [a ,b ,c];
+                                calculations = [twoFloor ,threeFloor ,fourFloor];
+                                calculation(oneFloor ,sings ,calculations);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    for(oneFloor in sixMap){
+        for(let a = 0; a < 4; a++){
+            for(twoFloor in sixMap[oneFloor]){
+                for(let b = 0; b < 4; b++){
+                    for(threeFloor in sixMap[oneFloor][twoFloor]){
+                        for(let c = 0; c < 4; c++){
+                            for(fourFloor in sixMap[oneFloor][twoFloor][threeFloor]){
+                                for(let d = 0; d < 4; d++){
+                                    for(fiveFloor in sixMap[oneFloor][twoFloor][threeFloor][fourFloor]){
+                                        sings = [a ,b ,c ,d];
+                                        calculations = [twoFloor ,threeFloor ,fourFloor ,fiveFloor];
+                                        calculation(oneFloor ,sings ,calculations);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    for(oneFloor in sixMap){
+        for(let a = 0; a < 4; a++){
+            for(twoFloor in sixMap[oneFloor]){
+                for(let b = 0; b < 4; b++){
+                    for(threeFloor in sixMap[oneFloor][twoFloor]){
+                        for(let c = 0; c < 4; c++){
+                            for(fourFloor in sixMap[oneFloor][twoFloor][threeFloor]){
+                                for(let d = 0; d < 4; d++){
+                                    for(fiveFloor in sixMap[oneFloor][twoFloor][threeFloor][fourFloor]){
+                                        for(let e = 0; e < 4; e++){
+                                            for(sixFloor in sixMap[oneFloor][twoFloor][threeFloor][fourFloor][fiveFloor]){
+                                                sings = [a ,b ,c ,d ,e];
+                                                calculations = [twoFloor ,threeFloor ,fourFloor ,fiveFloor ,sixFloor];
+                                                calculation(oneFloor ,sings ,calculations);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+}
+</script>
