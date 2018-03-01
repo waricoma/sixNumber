@@ -1,17 +1,17 @@
 <script>
-let numberInput = [10,9,25,1,100,1];
+let numberInput = [12, 45, 1000, 34, 78, 92];
 let numberInputLen = numberInput.length;
 let input = [];
 for(let i = 0; i < numberInputLen; i++)input[i] = numberInput[i] + "";
 
-let question = 271;
+let question = 1001;
 
 let firstExecutionPermit = true;
 let duplicateTimesArray = [];
 for(let i = 0; i < 6; i++){
     if(input[i] < 0){
         firstExecutionPermit = false;
-        console.log("6つの数字はすべて正の整数でなくてはなりません。");
+        console.log("ERROR: Part of typed six numbers by you is not 0 or positive integer. エラー: 6つの数字はすべて正の整数でなくてはなりません。");
         break;
     }
     if(duplicateTimesArray[ input[i] ] === undefined) duplicateTimesArray[ input[i] ] = 0;
